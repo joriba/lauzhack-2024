@@ -54,8 +54,6 @@ function init() {
 
   scene.add(painter1.mesh);
 
-  scene.add(DRAWING.line);
-
   // Set up the controllers
   const controllerModelFactory = new XRControllerModelFactory();
 
@@ -89,7 +87,7 @@ function animate() {
   if (!stylus) return;
   cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
 
-  DRAWING.update(stylus, gamepad1, cursor);
+  DRAWING.update(stylus, gamepad1, cursor, scene);
 
   // Render
   renderer.render(scene, camera);
