@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const MAX_POINTS = 500;
+const MAX_POINTS = 5000;
 
 let geometry;
 let drawCount = 0;
@@ -30,11 +30,13 @@ export function update(controller, gamepad1, cursor) {
     // debugGamepad(gamepad1);
 
     if (userData.isSelecting || isDrawing) {
-      const positionAttribute = geometry.getAttribute('position');
-      positionAttribute.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
-      geometry.getAttribute('position').needsUpdate = true;
-      drawCount++;
-      geometry.setDrawRange(0, drawCount);
+      if (drawCount < MAX_POINTS) {
+        const positionAttribute = geometry.getAttribute('position');
+        positionAttribute.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
+        geometry.getAttribute('position').needsUpdate = true;
+        drawCount++;
+        geometry.setDrawRange(0, drawCount);
+      }
     }
     else {
       drawCount = 0;
