@@ -1,12 +1,9 @@
 // Threejs is the 3d graphics library used
 import * as THREE from "three";
 import { TubePainter } from "three/examples/jsm/misc/TubePainter.js";
-import { XRButton } from "three/examples/jsm/webxr/XRButton.js";
 import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerModelFactory.js";
-// GLTFLoader loads GLTF objects, aka 3d assets
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-// DRACOloader loads geometry (compressed with DRACO) into the scene
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+
+import * as SCENE from "./scene.js";
 
 // ======= MAIN SCRIPT
 // CONSTANTS
@@ -32,30 +29,17 @@ const material = new THREE.MeshPhongMaterial({
 
 const cursor = new THREE.Vector3();
 
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-};
+const sizes = SCENE.sizes;
 
 init();
 
 // is run once, at the beginning of the program
 function init() {
   // =========== BASIC SCENE SETUP ================
-  const canvas = document.querySelector("canvas.webgl");
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x222222);
-  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 50);
-  camera.position.set(0, 1.6, 3);
-
-  const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath("/draco/");
-
-  const gltfLoader = new GLTFLoader();
-  gltfLoader.setDRACOLoader(dracoLoader);
-
-  const grid = new THREE.GridHelper(4, 1, 0x111111, 0x111111);
-  scene.add(grid);
+  SCENE.init(animate)
+  scene = SCENE.scene;
+  camera = SCENE.camera;
+  renderer = SCENE.renderer;
 
   // ========== LIGHT ==============
   scene.add(new THREE.HemisphereLight(0x888877, 0x777788, 3));
@@ -71,13 +55,6 @@ function init() {
 
   scene.add(painter1.mesh);
 
-  // set up the scene renderer
-  renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
-  renderer.setPixelRatio(window.devicePixelRatio, 2);
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setAnimationLoop(animate);
-  renderer.xr.enabled = true;
-  document.body.appendChild(XRButton.createButton(renderer, { optionalFeatures: ["unbounded"] }));
 
   // Set up the controllers
   const controllerModelFactory = new XRControllerModelFactory();
@@ -104,17 +81,7 @@ function init() {
 // boilerplate function, probably needed; updates the camera and 
 // renderer when the view is resized
 window.addEventListener("resize", () => {
-  // Update sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-
-  // Update camera
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
-
-  // Update renderer
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  SCENE.resize(window);
 });
 
 // updates the view if a button is pressed, that is, draws stuff
