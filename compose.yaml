@@ -13,4 +13,5 @@ services:
       - ./data/:/var/www/html:ro
     ports:
       - 80:80
+      - 443:443
 
