@@ -29,8 +29,6 @@ const material = new THREE.MeshPhongMaterial({
 
 const cursor = new THREE.Vector3();
 
-const sizes = SCENE.sizes;
-
 init();
 
 // is run once, at the beginning of the program
