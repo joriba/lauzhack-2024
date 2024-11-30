@@ -52,6 +52,8 @@ function init() {
   DRAWING.init()
 
 
+  DRAWING.init()
+
   // ========== LIGHT ==============
   scene.add(new THREE.HemisphereLight(0x888877, 0x777788, 3));
 
@@ -108,7 +110,6 @@ function animate() {
     (data) => {
       DRAWING.importLinesFromJSON(data,scene)
     }
-  );
 
   // Render
   renderer.render(scene, camera);
