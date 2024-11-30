@@ -1,9 +1,10 @@
 import * as THREE from "three";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { TubePainter } from "three/examples/jsm/misc/TubePainter.js";
 import { XRButton } from "three/examples/jsm/webxr/XRButton.js";
 import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerModelFactory.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { Text } from "troika-three-text";
 
 let camera, scene, renderer;
 let controller1, controller2;
@@ -17,6 +18,7 @@ let prevIsDrawing = false;
 const material = new THREE.MeshNormalMaterial({
   flatShading: true,
   side: THREE.DoubleSide,
+  
 });
 
 const cursor = new THREE.Vector3();
@@ -31,7 +33,7 @@ init();
 function init() {
   const canvas = document.querySelector("canvas.webgl");
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x222222);
+  scene.background = new THREE.Color(0x000000);
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 50);
   camera.position.set(0, 1.6, 3);
 
@@ -41,10 +43,20 @@ function init() {
   const gltfLoader = new GLTFLoader();
   gltfLoader.setDRACOLoader(dracoLoader);
 
-  const grid = new THREE.GridHelper(4, 1, 0x111111, 0x111111);
+  const grid = new THREE.GridHelper(4, 1, 0xff0000, 0xff0000); // set the drawing to red
   scene.add(grid);
 
   scene.add(new THREE.HemisphereLight(0x888877, 0x777788, 3));
+
+  const myText = new Text();
+  scene.add(myText);
+
+  myText.text = "Hello, world!";
+  myText.fontSize = 0.1;
+  myText.color = 0x0000ff;
+  myText.position.set(0, 1.5, 0);
+
+  myText.sync();
 
   const light = new THREE.DirectionalLight(0xffffff, 1.5);
   light.position.set(0, 4, 0);
