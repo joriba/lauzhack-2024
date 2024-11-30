@@ -10,7 +10,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 // ======= MAIN SCRIPT
 // CONSTANTS
-const DRAW_COLOR = "#000000"
+const DRAW_COLOR = "#ffffff"
 
 // Global variables to store the state of the camera, scene, controllers etc.
 let camera, scene, renderer;
