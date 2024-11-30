@@ -20,7 +20,6 @@ let stylus;
 let painter1;
 let gamepad1;
 let isDrawing = false;
-let prevIsDrawing = false;
 
 // The material with which to draw the strokes
 const material = new THREE.MeshPhongMaterial({
@@ -135,7 +134,6 @@ function handleDrawing(controller) {
   const painter = userData.painter;
 
   if (gamepad1) {
-    prevIsDrawing = isDrawing;
     isDrawing = gamepad1.buttons[5].value > 0;
     // debugGamepad(gamepad1);
 
