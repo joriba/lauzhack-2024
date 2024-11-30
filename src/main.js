@@ -1,7 +1,5 @@
 // Threejs is the 3d graphics library used
 import * as THREE from "three";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { TubePainter } from "three/examples/jsm/misc/TubePainter.js";
 import { XRButton } from "three/examples/jsm/webxr/XRButton.js";
 import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerModelFactory.js";
@@ -9,7 +7,6 @@ import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerM
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 // DRACOloader loads geometry (compressed with DRACO) into the scene
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import { Text } from "troika-three-text";
 
 // ======= MAIN SCRIPT
 // CONSTANTS
