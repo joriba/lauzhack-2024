@@ -29,50 +29,48 @@ function createNewLine() {
 }
 
 // Utility function that draws
-export function update(controller, gamepad1, cursor, scene) {
-  const userData = controller.userData;
+export function update(gamepad1, cursor, scene) {
+  if (!gamepad1) return;
 
   // BUTTONS:
   // 0: Front
   // 1: Back
   // 4: Touchscreen
-  if (gamepad1) {
-    isDrawing = gamepad1.buttons[4].value > 0;
-    const clearPressed = gamepad1.buttons[1].value > 0;
+  isDrawing = gamepad1.buttons[4].value > 0;
+  const clearPressed = gamepad1.buttons[1].value > 0;
 
-    // Clear all lines when button 1 is pressed
-    if (clearPressed) {
-      for(let line of lines) {
-        scene.remove(line);
-      }
-      lines = []; // Clear lines array
-      lineIndex = 0; // Reset index
-      drawCount = 0; // Reset draw count
-      return;
+  // Clear all lines when button 1 is pressed
+  if (clearPressed) {
+    for(let line of lines) {
+      scene.remove(line);
+    }
+    lines = []; // Clear lines array
+    lineIndex = 0; // Reset index
+    drawCount = 0; // Reset draw count
+    return;
+  }
+
+  if (isDrawing) {
+    // Start a new line if the draw count is zero
+    if (drawCount === 0) {
+      let newLine = createNewLine();
+      lines.push(newLine);
+      if(scene)
+        scene.add(newLine);
+      lineIndex = lines.length - 1;
     }
 
-    if (isDrawing) {
-      // Start a new line if the draw count is zero
-      if (drawCount === 0) {
-        let newLine = createNewLine();
-        lines.push(newLine);
-        if(scene)
-          scene.add(newLine);
-        lineIndex = lines.length - 1;
-      }
-
-      // Draw the current line
-      if (drawCount < MAX_POINTS) {
-        const positionAttribute = geometry.getAttribute("position");
-        positionAttribute.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
-        positionAttribute.needsUpdate = true;
-        drawCount++;
-        geometry.setDrawRange(0, drawCount);
-      }
-    } else {
-      // Reset draw count when drawing stops
-      drawCount = 0;
+    // Draw the current line
+    if (drawCount < MAX_POINTS) {
+      const positionAttribute = geometry.getAttribute("position");
+      positionAttribute.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
+      positionAttribute.needsUpdate = true;
+      drawCount++;
+      geometry.setDrawRange(0, drawCount);
     }
+  } else {
+    // Reset draw count when drawing stops
+    drawCount = 0;
   }
 }
 

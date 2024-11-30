@@ -97,7 +97,7 @@ function animate() {
   if (!stylus) return;
   cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
 
-  DRAWING.update(stylus, gamepad1, cursor, scene);
+  DRAWING.update(gamepad1, cursor, scene);
 
   // Render
   renderer.render(scene, camera);
