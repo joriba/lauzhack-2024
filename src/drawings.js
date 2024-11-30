@@ -21,9 +21,9 @@ export function init() {
 function createNewLine() {
   drawnPoints = [];
   for (let i = 0; i < MAX_POINTS; i++) {
-    drawnPoints.push(new THREE.Vector3(0, 0, i));
+    drawnPoints.push(new THREE.Vector3(0, 0, 0));
   }
-  geometry = new THREE.BufferGeometry().setFromPoints(drawnPoints);
+  let geometry = new THREE.BufferGeometry().setFromPoints(drawnPoints);
   geometry.setDrawRange(0, 0); // Start with no points
   return new THREE.Line(geometry, lineMaterial);
 }
@@ -38,9 +38,42 @@ export function update(gamepad1, cursor, scene) {
   // 4: Touchscreen
   isDrawing = gamepad1.buttons[4].value > 0;
   const clearPressed = gamepad1.buttons[1].value > 0;
+  const projectPressed = gamepad1.buttons[0].value > 0;
 
   // Clear all lines when button 1 is pressed
   if (clearPressed) {
+    for(let line of lines) {
+      scene.remove(line);
+    }
+    lines = []; // Clear lines array
+    lineIndex = 0; // Reset index
+    drawCount = 0; // Reset draw count
+    return;
+  }
+
+  if (projectPressed) {
+    const PROJECTION = new THREE.Matrix4();
+    PROJECTION.set(
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0
+    )
+
+    let combined = allPoints();
+    for (let i = 0; i < combined.length; i++) {
+      let point = combined[i];
+      // point.divideScalar(point.w);
+      combined[i] = new THREE.Vector3(point.x, point.y, -5);
+    }
+
+    let projectedMaterial = new THREE.LineBasicMaterial({
+      color: 0x00ff00
+    });
+    let newgeometry = new THREE.BufferGeometry()
+    newgeometry.setFromPoints(combined);
+    scene.add(new THREE.Line(newgeometry, projectedMaterial));
+
     for(let line of lines) {
       scene.remove(line);
     }
@@ -62,11 +95,11 @@ export function update(gamepad1, cursor, scene) {
 
     // Draw the current line
     if (drawCount < MAX_POINTS) {
-      const positionAttribute = geometry.getAttribute("position");
+      const positionAttribute = lines[lineIndex].geometry.getAttribute("position");
       positionAttribute.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
       positionAttribute.needsUpdate = true;
       drawCount++;
-      geometry.setDrawRange(0, drawCount);
+      lines[lineIndex].geometry.setDrawRange(0, drawCount);
     }
   } else {
     // Reset draw count when drawing stops
@@ -74,3 +107,16 @@ export function update(gamepad1, cursor, scene) {
   }
 }
 
+export function allPoints() {
+  let result = []
+  for (let line of lines) {
+    const positionAttribute = line.geometry.getAttribute('position');
+    let numPoints = line.geometry.drawRange.count;
+    for (let i = 0; i < numPoints; i++) {
+      const point = new THREE.Vector3();
+      point.fromBufferAttribute(positionAttribute, i);
+      result.push(point);
+    }
+  }
+  return result;
+}
