@@ -19,6 +19,9 @@ let painter1;
 let gamepad1;
 let isDrawing = false;
 
+const drawnPoints = [];
+let geometry;
+
 // The material with which to draw the strokes
 const material = new THREE.MeshPhongMaterial({
   color: DRAW_COLOR
@@ -56,13 +59,23 @@ function init() {
   light.position.set(0, 4, 0);
   scene.add(light);
 
-  // a TubePainter lets us draw fixed-width 3d lines
   painter1 = new TubePainter();
   painter1.mesh.material = material;
   painter1.setSize(0.1);
 
   scene.add(painter1.mesh);
 
+  drawnPoints.push( new THREE.Vector3(-10, 0, -10) );
+  drawnPoints.push( new THREE.Vector3(0, 10, -10) );
+  drawnPoints.push( new THREE.Vector3(10, 0, -10) );
+  console.log(drawnPoints);
+
+  let lineMaterial = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+  geometry = new THREE.BufferGeometry().setFromPoints(drawnPoints);
+  const line = new THREE.Line(geometry, lineMaterial);
+  scene.add(line);
 
   // Set up the controllers
   const controllerModelFactory = new XRControllerModelFactory();
