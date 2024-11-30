@@ -60,16 +60,6 @@ function init() {
   // ========== LIGHT ==============
   scene.add(new THREE.HemisphereLight(0x888877, 0x777788, 3));
 
-  const myText = new Text();
-  scene.add(myText);
-
-  myText.text = "Hello, world!";
-  myText.fontSize = 0.1;
-  myText.color = 0x0000ff;
-  myText.position.set(0, 1.5, 0);
-
-  myText.sync();
-
   const light = new THREE.DirectionalLight(0xffffff, 1.5);
   light.position.set(0, 4, 0);
   scene.add(light);
