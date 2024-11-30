@@ -4,6 +4,7 @@ import { TubePainter } from "three/examples/jsm/misc/TubePainter.js";
 import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerModelFactory.js";
 
 import * as SCENE from "./scene.js";
+import * as DRAWING from "./drawings.js"
 
 // ======= MAIN SCRIPT
 // CONSTANTS
@@ -16,10 +17,6 @@ let controllerGrip1, controllerGrip2;
 let stylus;
 let painter1;
 let gamepad1;
-let isDrawing = false;
-
-const drawnPoints = [];
-let geometry;
 
 // The material with which to draw the strokes
 const material = new THREE.MeshPhongMaterial({
@@ -42,6 +39,8 @@ function init() {
   camera = SCENE.camera;
   renderer = SCENE.renderer;
 
+  DRAWING.init()
+
   // ========== LIGHT ==============
   scene.add(new THREE.HemisphereLight(0x888877, 0x777788, 3));
 
@@ -55,17 +54,7 @@ function init() {
 
   scene.add(painter1.mesh);
 
-  drawnPoints.push( new THREE.Vector3(-10, 0, -10) );
-  drawnPoints.push( new THREE.Vector3(0, 10, -10) );
-  drawnPoints.push( new THREE.Vector3(10, 0, -10) );
-  console.log(drawnPoints);
-
-  let lineMaterial = new THREE.LineBasicMaterial({
-    color: 0x0000ff
-  });
-  geometry = new THREE.BufferGeometry().setFromPoints(drawnPoints);
-  const line = new THREE.Line(geometry, lineMaterial);
-  scene.add(line);
+  scene.add(DRAWING.line);
 
   // Set up the controllers
   const controllerModelFactory = new XRControllerModelFactory();
@@ -100,29 +89,10 @@ function animate() {
   if (!stylus) return;
   cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
 
-  handleDrawing(stylus);
+  DRAWING.update(stylus, gamepad1, cursor);
 
   // Render
   renderer.render(scene, camera);
-}
-
-// utility function that draws (who would've thunk)
-function handleDrawing(controller) {
-  const userData = controller.userData;
-  const painter = userData.painter;
-
-  if (gamepad1) {
-    isDrawing = gamepad1.buttons[5].value > 0;
-    // debugGamepad(gamepad1);
-
-    if (userData.isSelecting || isDrawing) {
-      painter.lineTo(cursor);
-      painter.update();
-    }
-    else {
-      painter.moveTo(controller.position)
-    }
-  }
 }
 
 // setup and teardown functions
