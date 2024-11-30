@@ -9,6 +9,8 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 // ======= MAIN SCRIPT
+// CONSTANTS
+const DRAW_COLOR = "#000000"
 
 // Global variables to store the state of the camera, scene, controllers etc.
 let camera, scene, renderer;
@@ -21,7 +23,9 @@ let isDrawing = false;
 let prevIsDrawing = false;
 
 // The material with which to draw the strokes
-const material = new THREE.MeshPhongMaterial()
+const material = new THREE.MeshPhongMaterial({
+  color: DRAW_COLOR
+})
 // const material = new THREE.MeshNormalMaterial({
 //   flatShading: true,
 //   side: THREE.DoubleSide,
@@ -116,6 +120,9 @@ window.addEventListener("resize", () => {
 
 // updates the view if a button is pressed, that is, draws stuff
 function animate() {
+  if (!stylus) return;
+  cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
+
   handleDrawing(stylus);
 
   // Render
@@ -124,8 +131,6 @@ function animate() {
 
 // utility function that draws (who would've thunk)
 function handleDrawing(controller) {
-  if (!controller) return;
-
   const userData = controller.userData;
   const painter = userData.painter;
 
@@ -134,21 +139,17 @@ function handleDrawing(controller) {
     isDrawing = gamepad1.buttons[5].value > 0;
     // debugGamepad(gamepad1);
 
-    // moves to a new position (without drawing) if we start drawing
-    // note that this means
-    if (isDrawing && !prevIsDrawing) {
-      painter.moveTo(stylus.position);
-    }
-
-    cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
-
     if (userData.isSelecting || isDrawing) {
       painter.lineTo(cursor);
       painter.update();
     }
+    else {
+      painter.moveTo(controller.position)
+    }
   }
 }
 
+// setup and teardown functions
 function onControllerConnected(e) {
   if (e.data.profiles.includes("logitech-mx-ink")) {
     stylus = e.target;
@@ -157,7 +158,6 @@ function onControllerConnected(e) {
   }
 }
 
-// setup and teardown functions
 function onSelectStart(e) {
   if (e.target !== stylus) return;
   const painter = stylus.userData.painter;
