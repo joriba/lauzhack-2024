@@ -104,6 +104,7 @@ public
 dist/
 
 .DS_Store
+.vite/
 
 
 # Data 

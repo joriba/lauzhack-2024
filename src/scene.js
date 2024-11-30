@@ -15,7 +15,7 @@ export const sizes = {
 
 export function init(animationLoop) {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x222222);
+  scene.background = new THREE.Color(0x000000);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 50);
   camera.position.set(0, 1.6, 3);
@@ -26,7 +26,7 @@ export function init(animationLoop) {
   const gltfLoader = new GLTFLoader();
   gltfLoader.setDRACOLoader(dracoLoader);
 
-  const grid = new THREE.GridHelper(4, 1, 0x111111, 0x111111);
+  const grid = new THREE.GridHelper(4, 1, 0xff0000, 0xff0000); // set the drawing to red
   scene.add(grid);
 
   // set up the scene renderer
