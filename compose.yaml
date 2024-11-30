@@ -1,0 +1,16 @@
+version: '3'
+services:
+  nginx:
+    build: 
+      context: ./dockerfiles/nginx
+      args:
+        WEB_USER_GID: 1000
+        WEB_USER_UID: 1000
+
+    restart: always
+    volumes:
+      - ./web_config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./data/:/var/www/html:ro
+    ports:
+      - 80:80
+
