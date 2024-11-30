@@ -25,11 +25,15 @@ export function init() {
 export function update(controller, gamepad1, cursor) {
   const userData = controller.userData;
 
+  // BUTTONS:
+  // 0: Front
+  // 1: Back
+  // 4: Touchscreen
   if (gamepad1) {
-    isDrawing = gamepad1.buttons[5].value > 0;
+    isDrawing = gamepad1.buttons[4].value > 0;
     // debugGamepad(gamepad1);
 
-    if (userData.isSelecting || isDrawing) {
+    if (isDrawing) {
       if (drawCount < MAX_POINTS) {
         const positionAttribute = geometry.getAttribute('position');
         positionAttribute.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
