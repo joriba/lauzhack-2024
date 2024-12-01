@@ -49,7 +49,6 @@ function init() {
   scene = SCENE.scene;
   camera = SCENE.camera;
   renderer = SCENE.renderer;
-
   DRAWING.init()
 
 
