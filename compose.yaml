@@ -6,7 +6,6 @@ services:
       args:
         WEB_USER_GID: 1000
         WEB_USER_UID: 1000
-
     restart: always
     volumes:
       - /etc/letsencrypt/:/etc/letsencrypt/:ro
@@ -15,4 +14,10 @@ services:
     ports:
       - 80:80
       - 443:443
+    depends_on:
+      - pythonstuff
+  pythonstuff:
+    build: 
+      context: ./server/
+    restart: always
 

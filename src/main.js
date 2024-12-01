@@ -8,6 +8,18 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 // DRACOloader loads geometry (compressed with DRACO) into the scene
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
+import { Communication, SpellSocket } from "./communication.js";
+
+let c = null;
+let s = new SpellSocket().then( () => {
+  c = new Communication(s);
+});
+
+document.getElementById("button2").onclick = () => {
+    let text = document.getElementById('mytext_send').value;
+    c.send(text);
+}
+
 // ======= MAIN SCRIPT
 // CONSTANTS
 const DRAW_COLOR = "#ffffff"
