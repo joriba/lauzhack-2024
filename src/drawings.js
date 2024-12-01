@@ -1,8 +1,8 @@
+import * as math from "mathjs"
 import * as THREE from "three";
 
 const MAX_POINTS = 5000;
 
-let geometry;
 let drawCount = 0;
 let drawnPoints = [];
 export let lines = []; // Initialize lines array
@@ -52,26 +52,15 @@ export function update(gamepad1, cursor, scene) {
   }
 
   if (projectPressed) {
-    const PROJECTION = new THREE.Matrix4();
-    PROJECTION.set(
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0
-    )
-
     let combined = allPoints();
-    for (let i = 0; i < combined.length; i++) {
-      let point = combined[i];
-      // point.divideScalar(point.w);
-      combined[i] = new THREE.Vector3(point.x, point.y, -5);
-    }
+    const bestPlane = computeBestFitPlane(combined);
+    let projected = projectToPlane(combined, bestPlane);
 
     let projectedMaterial = new THREE.LineBasicMaterial({
       color: 0x00ff00
     });
     let newgeometry = new THREE.BufferGeometry()
-    newgeometry.setFromPoints(combined);
+    newgeometry.setFromPoints(projected);
     scene.add(new THREE.Line(newgeometry, projectedMaterial));
 
     for(let line of lines) {
@@ -117,6 +106,46 @@ export function allPoints() {
       point.fromBufferAttribute(positionAttribute, i);
       result.push(point);
     }
+  }
+  return result;
+}
+
+function computeBestFitPlane(points) {
+  // Step 1: compute centroid
+  const centroid = new THREE.Vector3();
+  points.forEach(p => centroid.add(p));
+  centroid.divideScalar(points.length);
+
+  // Step 2: compute covariance matrix
+  let xx = 0, xy = 0, xz = 0, yy = 0, yz = 0, zz = 0;
+  points.forEach(p => {
+    const dx = p.x - centroid.x;
+    const dy = p.y - centroid.y;
+    const dz = p.z - centroid.z;
+    xx += dx * dx; xy += dx * dy; xz += dx * dz;
+    yy += dy * dy; yz += dy * dz; zz += dz * dz;
+  });
+
+  const covarianceMatrix = [
+    [xx, xy, xz],
+    [xy, yy, yz],
+    [xz, yz, zz],
+  ];
+
+  const eigen = math.eigs(covarianceMatrix);
+  const normal = new THREE.Vector3(...eigen.eigenvectors[0].vector);
+  return { normal, centroid };
+}
+
+function projectToPlane(points, plane) {
+  const {normal, centroid} = plane;
+  let normalizedNormal = normal.clone().normalize();
+  let result = [...points];
+  for (let i = 0; i < points.length; i++) {
+    let point = result[i].clone();
+    let toPoint = point.sub(centroid);
+    const distance = toPoint.dot(normalizedNormal);
+    result[i].sub(normalizedNormal.clone().multiplyScalar(distance));
   }
   return result;
 }
