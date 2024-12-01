@@ -51,7 +51,7 @@ function init() {
 
   painter1 = new TubePainter();
   painter1.mesh.material = material;
-  painter1.setSize(0.1);
+  painter1.setSize(0.5);
 
   scene.add(painter1.mesh);
 
@@ -89,7 +89,7 @@ function animate() {
   cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
 
   DRAWING.update(stylus, gamepad1, cursor, scene);
-  SHOOT.update(stylus, gamepad1, cursor, scene)
+  SHOOT.update(stylus, gamepad1, cursor, scene, DRAWING.lines)
 
   // Render
   renderer.render(scene, camera);
