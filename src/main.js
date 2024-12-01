@@ -4,7 +4,6 @@ import { TubePainter } from "three/examples/jsm/misc/TubePainter.js";
 import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerModelFactory.js";
 
 import * as SCENE from "./scene.js";
-
 import { Communication, SpellSocket } from "./communication.js";
 
 // ======= MAIN SCRIPT
@@ -30,6 +29,8 @@ const material = new THREE.MeshPhongMaterial({
 // });
 
 const cursor = new THREE.Vector3();
+
+const sizes = SCENE.sizes;
 
 init();
 
