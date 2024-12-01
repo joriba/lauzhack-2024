@@ -9,10 +9,15 @@ export let lines = []; // Initialize lines array
 export let newLines = []; 
 export let remoteLines = [];
 let lineIndex = 0;
+let newLineIndex = 0;
 let isDrawing = false;
 
 let lineMaterial = new THREE.LineBasicMaterial({
   color: 0x0000ff
+});
+
+let lineMaterialOpponent = new THREE.LineBasicMaterial({
+  color: 0xff0000
 });
 
 export function init() {
@@ -81,6 +86,7 @@ export function update(gamepad1, cursor, scene) {
     }
     lines = []; // Clear lines array
     lineIndex = 0; // Reset index
+    newLineIndex = 0; // Reset index
     drawCount = 0; // Reset draw count
     return;
   }
@@ -90,10 +96,11 @@ export function update(gamepad1, cursor, scene) {
     if (drawCount === 0) {
       let newLine = createNewLine();
       lines.push(newLine);
-      newLines.push(newLine);
+      newLines.push(newLine.clone());
       if(scene)
         scene.add(newLine);
       lineIndex = lines.length - 1;
+      newLineIndex = newLines.length - 1;
     }
 
     // Draw the current line
@@ -101,8 +108,12 @@ export function update(gamepad1, cursor, scene) {
       const positionAttribute = lines[lineIndex].geometry.getAttribute("position");
       positionAttribute.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
       positionAttribute.needsUpdate = true;
+      //const positionAttributeNew = newLines[newLineIndex].geometry.getAttribute("position");
+      //positionAttributeNew.setXYZ(drawCount, cursor.x, cursor.y, cursor.z);
+      //positionAttributeNew.needsUpdate = true;
       drawCount++;
       lines[lineIndex].geometry.setDrawRange(0, drawCount);
+      newLines[newLineIndex].geometry.setDrawRange(0, drawCount);
     }
   } else {
     // Reset draw count when drawing stops
@@ -125,6 +136,8 @@ export function allPoints() {
 }
 
 export function exportLinesToJSON() {
+  if (isDrawing)
+    return "[]";
   let out = [];
   for (let line of newLines) {
     let lineOut = [];
@@ -144,6 +157,7 @@ export function exportLinesToJSON() {
     out.push(lineOut);
   }
   newLines = [];
+  newLineIndex = 0;
   const newLinesJson = JSON.stringify(out);
   return newLinesJson;
 }
@@ -158,9 +172,11 @@ export function importLinesFromJSON(jsonLines, scene) {
       );
     }
     let geometry = new THREE.BufferGeometry().setFromPoints(drawnPoints);
-    geometry.setDrawRange(0, 0); // Start with no points
-    const line = new THREE.Line(geometry, lineMaterial);
+    geometry.setDrawRange(0, lineArray.length-1); // Start with no points
+    const line = new THREE.Line(geometry, lineMaterialOpponent);
     scene.add(line);
+    console.log(lineArray)
+    console.log(drawnPoints)
     remoteLines.push(line);
   }
 }
