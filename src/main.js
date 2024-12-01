@@ -8,6 +8,18 @@ import { Communication, SpellSocket } from "./communication.js";
 // import { Calibration } from "./calibration.js";
 import * as DRAWING from "./drawings.js"
 
+import { Communication, SpellSocket } from "./communication.js";
+
+let c = null;
+let s = new SpellSocket().then( () => {
+  c = new Communication(s);
+});
+
+document.getElementById("button2").onclick = () => {
+    let text = document.getElementById('mytext_send').value;
+    c.send(text);
+}
+
 // ======= MAIN SCRIPT
 // CONSTANTS
 const DRAW_COLOR = "#ffffff"
@@ -110,6 +122,7 @@ function animate() {
     (data) => {
       DRAWING.importLinesFromJSON(data,scene)
     }
+  );
 
   // Render
   renderer.render(scene, camera);

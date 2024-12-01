@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 // DEBUG: const SERVER_HOST="ws://localhost:8080";
 const SERVER_HOST="wss://spellz.a1n.ch:4443";
 
 
 // Socket to server (to find p2p partner)
+=======
+const SERVER_HOST="ws://localhost:8080";
+//const SERVER_HOST="wss://spellz.a1n.ch:8080";
+
+>>>>>>> 96186f3 (add server stuff)
 export class SpellSocket {
     constructor() {
         this.socket = new WebSocket(SERVER_HOST);
@@ -20,7 +26,10 @@ export class SpellSocket {
     }
 
     send(json) {
+<<<<<<< HEAD
         console.log("sending via websocket:" + json)
+=======
+>>>>>>> 96186f3 (add server stuff)
         this.socket.send(json);
     }
 
