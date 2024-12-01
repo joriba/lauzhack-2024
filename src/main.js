@@ -5,6 +5,7 @@ import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerM
 
 import * as SCENE from "./scene.js";
 import { Communication, SpellSocket } from "./communication.js";
+// import { Calibration } from "./calibration.js";
 import * as DRAWING from "./drawings.js"
 
 // ======= MAIN SCRIPT
@@ -50,6 +51,7 @@ function init() {
   renderer = SCENE.renderer;
 
   DRAWING.init()
+
 
   // ========== LIGHT ==============
   scene.add(new THREE.HemisphereLight(0x888877, 0x777788, 3));
@@ -98,6 +100,9 @@ function animate() {
   cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
 
   DRAWING.update(gamepad1, cursor, scene);
+
+  /*let cal = new Calibration();
+  cal.calibrate(gamepad1, cursor, scene);*/
 
   connection.send(DRAWING.exportLinesToJSON());
   connection.setOnDataReceivedHandler(
