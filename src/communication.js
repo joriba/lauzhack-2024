@@ -1,6 +1,8 @@
 // DEBUG: const SERVER_HOST="ws://localhost:8080";
 const SERVER_HOST="wss://spellz.a1n.ch:4443";
 
+
+// Socket to server (to find p2p partner)
 export class SpellSocket {
     constructor() {
         this.socket = new WebSocket(SERVER_HOST);
@@ -18,6 +20,7 @@ export class SpellSocket {
     }
 
     send(json) {
+        console.log("sending via websocket:" + json)
         this.socket.send(json);
     }
 
@@ -29,13 +32,14 @@ export class SpellSocket {
 
 }
 
-
+/* Communication via webrtc*/
 export class Communication {
     constructor(spellSocket) {
         // This means in this object...
-        this.onReceiveData = (data) => {console.log(data)};
+        this.onReceiveData = (data) => {};
         this.connect = this.connect.bind(this);
         this.onReceiveDataChannel = this.onReceiveDataChannel.bind(this);
+        this.setOnDataReceivedHandler = this.setOnDataReceivedHandler.bind(this);
         this.onIceCandidate = this.onIceCandidate.bind(this);
 
         // Let connect handle messages from Socket
@@ -76,12 +80,12 @@ export class Communication {
 
     }
 
+    // On ICE Candidate: STUN or TURN servers
     onIceCandidate(e) {
         // event.candidate == null if all candidates gathered
         if (e.candidate == null) {
-            console.log("Get joiners to call: ");
+            console.log("finished gathering ICE candidates.")
             // Generate info for other client so joining is possib
-            console.log(this.localDescription);
             const sdp = {
                 sdp: this.peerConn.localDescription.sdp,
                 type: this.peerConn.localDescription.type
@@ -96,17 +100,20 @@ export class Communication {
         }
     }
 
+    // Data received over webrtc
     onReceiveDataChannel(e) {
+        console.log("Got a new data channel!");
         e.channel.onmessage = (data) => {
             this.onReceiveData(data.data);
         }
     }
 
+    // Set handler for data received over webrtc
     setOnDataReceivedHandler(handler) {
         this.onReceiveData = handler;
     }
 
-
+    // Handler for Initialisation of webrtc connection
     connect(responseSdp) {
         // Add Ice Candidate from json description
         const sdp = JSON.parse(responseSdp);
@@ -140,9 +147,9 @@ export class Communication {
         }
     }
 
+    // Send over webrtc
     send(msg) {
         try {
-            console.log("trying to send: " + msg)
             this.dataChannel.send(msg);
         } catch (e) {
             console.log(e);

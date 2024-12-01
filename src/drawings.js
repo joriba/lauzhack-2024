@@ -6,6 +6,8 @@ let geometry;
 let drawCount = 0;
 let drawnPoints = [];
 export let lines = []; // Initialize lines array
+export let newLines = []; 
+export let remoteLines = [];
 let lineIndex = 0;
 let isDrawing = false;
 
@@ -88,6 +90,7 @@ export function update(gamepad1, cursor, scene) {
     if (drawCount === 0) {
       let newLine = createNewLine();
       lines.push(newLine);
+      newLines.push(newLine);
       if(scene)
         scene.add(newLine);
       lineIndex = lines.length - 1;
@@ -119,4 +122,45 @@ export function allPoints() {
     }
   }
   return result;
+}
+
+export function exportLinesToJSON() {
+  let out = [];
+  for (let line of newLines) {
+    let lineOut = [];
+    const positionAttribute = line.geometry.getAttribute('position');
+    let numPoints = line.geometry.drawRange.count;
+    for (let i = 0; i < numPoints; i++) {
+      const point = new THREE.Vector3();
+      point.fromBufferAttribute(positionAttribute, i);
+      lineOut.push(
+        [
+          point.x,
+          point.y,
+          point.z
+        ]
+      );
+    }
+    out.push(lineOut);
+  }
+  newLines = [];
+  const newLinesJson = JSON.stringify(out);
+  return newLinesJson;
+}
+
+export function importLinesFromJSON(jsonLines, scene) {
+  const newLinesRemote =  JSON.parse(jsonLines);
+  for ( let lineArray of newLinesRemote ) {
+    drawnPoints = [];
+    for ( let pointArray of lineArray ) {
+      drawnPoints.push(
+        new THREE.Vector3(pointArray[0], pointArray[1], pointArray[2])
+      );
+    }
+    let geometry = new THREE.BufferGeometry().setFromPoints(drawnPoints);
+    geometry.setDrawRange(0, 0); // Start with no points
+    const line = new THREE.Line(geometry, lineMaterial);
+    scene.add(line);
+    remoteLines.push(line);
+  }
 }

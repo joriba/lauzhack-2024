@@ -18,6 +18,7 @@ let controllerGrip1, controllerGrip2;
 let stylus;
 let painter1;
 let gamepad1;
+let connection;
 
 // The material with which to draw the strokes
 const material = new THREE.MeshPhongMaterial({
@@ -37,7 +38,6 @@ init();
 // is run once, at the beginning of the program
 function init() {
   // ===========  NETWORK INITIALISATION ================
-  let connection = null;
   let socket = new SpellSocket().then( () => {
     connection = new Communication(socket);
   });
@@ -98,6 +98,13 @@ function animate() {
   cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
 
   DRAWING.update(gamepad1, cursor, scene);
+
+  connection.send(DRAWING.exportLinesToJSON());
+  connection.setOnDataReceivedHandler(
+    (data) => {
+      DRAWING.importLinesFromJSON(data,scene)
+    }
+  );
 
   // Render
   renderer.render(scene, camera);
