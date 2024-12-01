@@ -1,5 +1,5 @@
-const SERVER_HOST="ws://localhost:8080";
-//const SERVER_HOST="wss://spellz.a1n.ch:8080";
+// DEBUG: const SERVER_HOST="ws://localhost:8080";
+const SERVER_HOST="wss://spellz.a1n.ch:4443";
 
 export class SpellSocket {
     constructor() {
