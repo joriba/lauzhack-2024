@@ -5,6 +5,7 @@ import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerM
 
 import * as SCENE from "./scene.js";
 import * as DRAWING from "./drawings.js"
+import * as SHOOT from "./shoot.js"
 
 // ======= MAIN SCRIPT
 // CONSTANTS
@@ -88,6 +89,7 @@ function animate() {
   cursor.set(stylus.position.x, stylus.position.y, stylus.position.z);
 
   DRAWING.update(stylus, gamepad1, cursor, scene);
+  SHOOT.update(stylus, gamepad1, cursor, scene)
 
   // Render
   renderer.render(scene, camera);
