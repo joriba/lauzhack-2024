@@ -56,12 +56,7 @@ export function update(gamepad1, cursor, scene) {
     const bestPlane = computeBestFitPlane(combined);
     let projected = projectToPlane(combined, bestPlane);
 
-    let projectedMaterial = new THREE.LineBasicMaterial({
-      color: 0x00ff00
-    });
-    let newgeometry = new THREE.BufferGeometry()
-    newgeometry.setFromPoints(projected);
-    scene.add(new THREE.Line(newgeometry, projectedMaterial));
+    getImageForDrawnPoints(projected, bestPlane, scene);
 
     for(let line of lines) {
       scene.remove(line);
@@ -148,4 +143,73 @@ function projectToPlane(points, plane) {
     result[i].sub(normalizedNormal.clone().multiplyScalar(distance));
   }
   return result;
+}
+
+function getImageForDrawnPoints(points, plane, scene) {
+  // Step 1: find 2d basis for the plane
+  let planeNormal = plane.normal, planePoint = plane.centroid;
+  let arbitraryVec = new THREE.Vector3(1, 0, 0);
+  let u = new THREE.Vector3().crossVectors(planeNormal, arbitraryVec).normalize();
+  let v = new THREE.Vector3().crossVectors(planeNormal, u).normalize();
+
+  // Step 2: map each point to its coordinates in plane coordinates
+  let newPoints = points.map(p => {
+    let r = new THREE.Vector3().subVectors(p, planePoint);
+    return new THREE.Vector2(r.dot(u), r.dot(v));
+  })
+
+  // Step 3: scale and translate it to the unit square
+  // Find bounding box of points
+  const min = { x: Infinity, y: Infinity };
+  const max = { x: -Infinity, y: -Infinity };
+  
+  newPoints.forEach(point => {
+    min.x = Math.min(min.x, point.x);
+    min.y = Math.min(min.y, point.y);
+    max.x = Math.max(max.x, point.x);
+    max.y = Math.max(max.y, point.y);
+  });
+
+  let translation = new THREE.Vector2((max.x - min.x) / 2, (max.y - min.y) / 2);
+  let translated = newPoints.map(point => new THREE.Vector2().addVectors(point, translation));
+
+  let scaleFactorX = 1 / (max.x - min.x), scaleFactorY = 1 / (max.y - min.y);
+  let scaled = translated.map(point => {
+    let result = point.clone().multiply(new THREE.Vector2(scaleFactorX, scaleFactorY))
+    result.x = Math.min(Math.max(0, result.x), 0.999999);
+    result.y = Math.min(Math.max(0, result.y), 0.999999);
+    return result;
+  })
+
+  // Step 4: Rasterize the points
+  const IMG_SIZE = 16;
+  let rasterized = [...Array(IMG_SIZE)].map(e => Array(IMG_SIZE).fill(0));
+  for(let point of scaled) {
+    let x = Math.floor(point.x * IMG_SIZE);
+    let y = Math.floor(point.y * IMG_SIZE);
+    rasterized[x][y] = 1;
+  }
+  console.log(rasterized);
+
+  // draw to debug
+  let rasterizedPoints = []
+  for (let x = 0; x < IMG_SIZE; x++) {
+    for (let y = 0; y < IMG_SIZE; y++) {
+      if (rasterized[x][y] == 1) {
+        rasterizedPoints.push(new THREE.Vector3(
+          x / IMG_SIZE - 0.5,
+          0,
+          y / IMG_SIZE - 0.5
+        ))
+      }
+    }
+  }
+  
+  let projectedMaterial = new THREE.LineBasicMaterial({
+    color: 0x00ff00
+  });
+  let newgeometry = new THREE.BufferGeometry()
+  newgeometry.setFromPoints(rasterizedPoints);
+  scene.add(new THREE.Points(newgeometry, projectedMaterial));
+
 }
