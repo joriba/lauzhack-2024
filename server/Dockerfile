@@ -14,6 +14,6 @@ EXPOSE 80
 
 USER uwsgi_user
 
-RUN pip3 install -r requirements.txt --break-system-packages.
+RUN pip3 install -r requirements.txt --break-system-packages
 
 CMD python server.py
