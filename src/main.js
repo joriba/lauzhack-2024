@@ -5,7 +5,6 @@ import { XRControllerModelFactory } from "three/examples/jsm/webxr/XRControllerM
 
 import * as SCENE from "./scene.js";
 import * as DRAWING from "./drawings.js"
-import { eigs } from "mathjs";
 // ======= MAIN SCRIPT
 // CONSTANTS
 const DRAW_COLOR = "#ffffff"

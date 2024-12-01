@@ -1,13 +1,16 @@
 import * as math from "mathjs"
 import * as THREE from "three";
+import * as SPELLS from "./spells.js"
 
 const MAX_POINTS = 5000;
 
 let drawCount = 0;
 let drawnPoints = [];
-export let lines = []; // Initialize lines array
+export let lines; // Initialize lines array
 let lineIndex = 0;
 let isDrawing = false;
+let projectPressed = false;
+let prevProjectPressed = false;
 
 let lineMaterial = new THREE.LineBasicMaterial({
   color: 0x0000ff
@@ -15,7 +18,7 @@ let lineMaterial = new THREE.LineBasicMaterial({
 
 export function init() {
   // Initialize the lines array and the first line
-  lines[lineIndex] = createNewLine();
+  lines = [];
 }
 
 function createNewLine() {
@@ -25,6 +28,7 @@ function createNewLine() {
   }
   let geometry = new THREE.BufferGeometry().setFromPoints(drawnPoints);
   geometry.setDrawRange(0, 0); // Start with no points
+  console.log(lines);
   return new THREE.Line(geometry, lineMaterial);
 }
 
@@ -38,7 +42,8 @@ export function update(gamepad1, cursor, scene) {
   // 4: Touchscreen
   isDrawing = gamepad1.buttons[4].value > 0;
   const clearPressed = gamepad1.buttons[1].value > 0;
-  const projectPressed = gamepad1.buttons[0].value > 0;
+  prevProjectPressed = projectPressed;
+  projectPressed = gamepad1.buttons[0].value > 0;
 
   // Clear all lines when button 1 is pressed
   if (clearPressed) {
@@ -51,7 +56,8 @@ export function update(gamepad1, cursor, scene) {
     return;
   }
 
-  if (projectPressed) {
+  if (projectPressed && !prevProjectPressed) {
+    console.log(clearPressed);
     let combined = allPoints();
     const bestPlane = computeBestFitPlane(combined);
     let projected = projectToPlane(combined, bestPlane);
@@ -93,6 +99,7 @@ export function update(gamepad1, cursor, scene) {
 
 export function allPoints() {
   let result = []
+  console.log(lines);
   for (let line of lines) {
     const positionAttribute = line.geometry.getAttribute('position');
     let numPoints = line.geometry.drawRange.count;
@@ -190,6 +197,9 @@ function getImageForDrawnPoints(points, plane, scene) {
     rasterized[x][y] = 1;
   }
   console.log(rasterized);
+
+  // STEP 5: Compare to the references and display the best fitting
+  console.log(SPELLS.bestFittingSpell(rasterized));
 
   // draw to debug
   let rasterizedPoints = []
